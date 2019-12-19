@@ -15,7 +15,7 @@
 - 细节配置：临时目录、图片存储目录、目录前缀、网站标题、关键词、
 允许上传文件的字节头、最大文件大小限制、是否压缩图片、信任反代ip、记录上传信息、是否鉴黄等
 
-> 所需环境：jdk-1.8、redis、pngquant
+> 所需环境：jdk-1.8、redis、pngquant、ImageMagick
 
 ```shell script
 // 安装Java环境 正常 Centos 即可安装 OpenJdk1.8
@@ -54,8 +54,8 @@ cd ImageMagick
 ```
 
 
-> Redis 和 pngquant、ImageMagick 是可选的，开启极速秒传需要 Redis，开启png压缩需要 pngquant,jpg压缩需要ImageMagick
->暂时 gif 没有好的压缩方案不压缩
+> Redis 和 pngquant、ImageMagick 是可选的，开启极速秒传需要 Redis，开启png压缩需要 pngquant，jpg压缩需要ImageMagick
+>，暂时 gif 没有好的压缩方案不压缩
 
 #### 2、更详细的配置启动 application.properties
 
@@ -172,6 +172,8 @@ ps : 这里的删除这是删除数据库内容，并不会删除硬盘和云存
 > 还可以指定启动参数来启动
 ```shell script
 // 解决中文乱码~ 其他配置配置在文件类,个别中文配置用启动命令行配置
+// 上面可调参数均可以启动配置
+
 java -jar jpicasso-1.0.jar --website.title=毕加索图床 --website.keywords=毕加索图床,免费图床,免费图片外链,高速外链图床 --compress.mode=1
 ```
 >
