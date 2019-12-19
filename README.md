@@ -54,7 +54,8 @@ cd ImageMagick
 ```
 
 
-> Redis 和 pngquant 是可选的，开启极速秒传需要 Redis，开启普通压缩需要 pngquant
+> Redis 和 pngquant、ImageMagick 是可选的，开启极速秒传需要 Redis，开启png压缩需要 pngquant,jpg压缩需要ImageMagick
+>暂时 gif 没有好的压缩方案不压缩
 
 #### 2、更详细的配置启动 application.properties
 
