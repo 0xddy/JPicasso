@@ -28,7 +28,7 @@ yum install -y redis
 ```
 
 ```shell script
-// 安装 pngquant 小提示事先需要有 libpng 1.6 or 更高版本
+// 安装 pngquant 用来压缩png图片,小提示事先需要有 libpng 1.6 or 更高版本
 
 git clone --recursive https://github.com/kornelski/pngquant.git
 cd pngquant
@@ -36,6 +36,21 @@ make
 make install
 
 //还是不会就直接去看文档吧 https://pngquant.org/install.html
+```
+```shell script
+
+// 安装 ImageMagick 用来压缩jpg图片
+// 官方文档 https://imagemagick.org/script/install-source.php                                                         
+// ps 网上也有更简单快速的安装,只要能安装上就行
+// https://blog.csdn.net/mytt_10566/article/details/80902059
+
+yum install autoconf automake libtool
+git clone https://github.com/ImageMagick
+cd ImageMagick
+
+// 默认安装目录 /usr/local/bin/
+// 那么执行程序配置里面路径就是 /usr/local/bin/magick
+
 ```
 
 
@@ -82,13 +97,21 @@ server.proxy.safeip=
 upload.info.write=1
 # 压缩图片 1 开启、0 关闭
 compress.mode=1
-# 使用pngquant进行图片压缩处理 需安装
+# 使用pngquant压缩png图片 需安装
 #compress.pngquant.path=C://pngquant/pngquant.exe
 compress.pngquant.path=/usr/local/bin/pngquant
 # 数字越大越快，文件越大，一般默认即可
 compress.pngquant.speed=2
 # 压缩质量区间 默认即可
 compress.pngquant.quality=50-90
+
+# 使用 ImageMagick 压缩jpg ,magick执行文件
+#compress.magick.path=C://ImageMagick-7.0.8-Q16/magick.exe
+compress.magick.path=/usr/local/bin/magick
+compress.magick.quality=75%
+# 小于该值不压缩
+compress.magick.limit.min=51200
+
 # 0 不开启同步至云存储
 # 1 阿里云OSS 、2 腾讯云COS 、3 七牛云、4 百度云BOS
 file.yun=0
@@ -144,10 +167,16 @@ upload.local=1
 ps : 这里的删除这是删除数据库内容，并不会删除硬盘和云存储上的内容
 
 
-> ##### 将上面的配置全部复制 新建一个 application.properties 和 jar 放一起，启动jar会自动读取配置 （注意要 utf-8编码）
+> ##### 将上面的配置全部复制 新建一个 application.properties 和 jar 放一起，启动jar会自动读取配置 （中文乱码的话请转成 unicode编码）
+> 还可以指定启动参数来启动
+```shell script
+// 解决中文乱码~ 其他配置配置在文件类,个别中文配置用启动命令行配置
+java -jar jpicasso-1.0.jar --website.title=毕加索图床 --website.keywords=毕加索图床,免费图床,免费图片外链,高速外链图床 --compress.mode=1
+```
 >
+>启动参数的配置优先于配置文件
 
-## 启动程序 
+## 基本启动程序 
 ```shell script
 java -jar jpicasso-1.0.jar
 ```
