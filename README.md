@@ -114,7 +114,7 @@ compress.magick.quality=75%
 compress.magick.limit.min=51200
 
 # 0 不开启同步至云存储
-# 1 阿里云OSS 、2 腾讯云COS 、3 七牛云、4 百度云BOS
+# 1 阿里云OSS 、2 腾讯云COS 、3 七牛云、4 百度云BOS、5 sftp(ssh)
 file.yun=0
 file.yun.ali.accessKeyId=sXwyTcfPDH1jaG1
 file.yun.ali.accessKeySecret=hUIR5MXm0mrNMxarqmXzTGbFy6d1
@@ -136,6 +136,19 @@ file.yun.baidu.bucketName=test212319
 #上传文件的存储类型
 ## 1 常规 、2 低频 、3 冷存储
 file.yun.baidu.type=1
+
+# sftp 同步至其他服务器 [试验阶段]
+# 由于sftp的连接限制，最多可以同时连接10个Session会话，每个会话可以打开10个通道传输
+# 虽然做了通道复用机制，但是遇到高并发会阻塞其他线程
+file.yun.sftp.host=119.28.52.127
+file.yun.sftp.username=root
+file.yun.sftp.port=22
+file.yun.sftp.password=
+# 同步到目标服务器的目录
+# 这个目录需要自己创建好
+file.yun.sftp.path=/www/wwwroot/static.com
+
+
 # 开启图片鉴黄 1 开启、2 关闭
 file.yun.check=1
 # 鉴黄检测到色情图片是否删除图片，1 开启、0 关闭
