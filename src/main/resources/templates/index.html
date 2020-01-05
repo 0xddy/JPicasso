@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>${webTitle}</title>
+    <meta name="keywords" content="${websiteKeywords}"/>
+    <link rel="stylesheet" href="/static/css/layui.css">
+    <link rel="stylesheet" href="/static/css/main.css" media="all">
+    <script src="/static/js/layui.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/clipboard.min.js"></script>
+    ${websiteHeader}
+    <script>
+        let picUrl = '${websiteUploadPicUrl}';
+        let sign = '';
+
+        console.log('%c~~ 欢迎来到本站 ~~', 'font-size:20px;color:red;');
+        console.log('%c小提示:登录用户请在控制台执行login方法~', 'font-size:10px;color:#D64F62;');
+        console.log("%c例如:login('admin','123456')", 'font-size:10px;color:#D64F62;');
+        let login = function (user, pwd) {
+            let $ = layui.jquery;
+            $.get('/user/login?user=' + user + '&pwd=' + pwd, function (b) {
+                console.log('登录成功！快关闭控制台上传图片试试吧~');
+            });
+            return '登录中...请稍等';
+        };
+
+        function initViews() {
+            let $ = layui.jquery;
+            let upload = layui.upload;
+
+            let listView = $('#listView');
+
+            let clipboard1 = new ClipboardJS('#copy_all', {
+                text: function (trigger) {
+                    return copyUrls(1);
+                }
+            });
+            let clipboard2 = new ClipboardJS('#copy_all_ubb', {
+                text: function (trigger) {
+                    return copyUrls(2);
+                }
+            });
+            let clipboard3 = new ClipboardJS('#copy_all_md', {
+                text: function (trigger) {
+                    return copyUrls(3);
+                }
+            });
+
+            clipboard1.on('success', onCopySuccess);
+            clipboard2.on('success', onCopySuccess);
+            clipboard3.on('success', onCopySuccess);
+
+            upload.render({
+                elem: '#upload-view'
+                , url: '/api/upload.phpNo1?sign=' + sign
+                , accept: 'file'
+                , exts: 'gif|png|jpeg|jpg|bmp|webp'
+                , multiple: true
+                , before: function (obj) {
+                    uploadFiles = {};
+                    listView.empty();
+                    let tableView = $('#table-view');
+                    tableView.attr('class', 'layui-anim layui-anim-fadein');
+                    tableView.removeAttr('hidden');
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function (index, file, result) {
+                        index = index.split('-')[1];
+                        let tr = $(['<tr id="upload-' + index + '">'
+                            , '<td>' + file.name + '</td>'
+                            , '<td>' + (file.size / 1014).toFixed(1) + 'kb</td>'
+                            , '<td><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i><span class="mag">上传中</span></td>'
+                            , '<td><input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="" class="layui-input"></td>'
+                            , '</tr>'].join(''));
+
+                        listView.append(tr);
+                        uploadFiles[index] = {index: index, file: file, imgUrl: ''};
+                    });
+                }
+                , done: function (res, index) {
+
+                    index = index.split('-')[1];
+                    let tds = $('tr[id="upload-' + index + '"] td');
+                    if (res.code !== 200) {
+                        $(tds[2]).text(res.msg);
+                    } else {
+                        if (res.fast !== undefined && res.fast === 1) {
+                            $(tds[2]).html('极速上传');
+                        } else {
+                            $(tds[2]).html('上传完成（' + (res.isCompress ? "压缩后 " + byteFormat(res.size) : "原图") + ')');
+                        }
+                        uploadFiles[index]['imgUrl'] = res.data;
+                        $(tds[3]).find('input').val(picUrl + uploadFiles[index]['imgUrl']);
+                    }
+                }
+                , error: function (index, e) {
+                    //请求异常回调
+                    index = index.split('-')[1];
+                    let tds = $('tr[id="upload-' + index + '"] td');
+                    $(tds[2]).html("上传失败");
+                }
+            });
+
+        }
+
+        layui.use(['upload', 'form'], function () {
+            initViews();
+        });
+
+    </script>
+
+</head>
+<body>
+
+<div class="layui-header">
+    <a href="/">
+        <div class="layui-logo"><span class="title">${webTitle}</span></div>
+    </a>
+</div>
+
+<div class="upload-panel">
+
+    <div class="layui-upload-drag" id="upload-view">
+        <i class="layui-icon"></i>
+        <p>点击上传，或将文件拖拽到此处</p>
+    </div>
+
+</div>
+
+<div id="table-view" hidden="hidden">
+
+    <div class="layui-upload" id="c">
+
+        <div class="layui-upload-list">
+            <table class="layui-table">
+                <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>源大小</th>
+                    <th>状态</th>
+                    <th>外链地址
+                        <button id="copy_all" class="layui-btn layui-btn-sm layui-btn-radius">IMG</button>
+                        <button id="copy_all_md" class="layui-btn layui-btn-sm layui-btn-radius">Markdown</button>
+                        <button id="copy_all_ubb" class="layui-btn layui-btn-sm layui-btn-radius">UBB</button>
+                    </th>
+                </tr>
+                </thead>
+                <tbody id="listView"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<!-- Power by JPicasso，Author 桥下红药 https://lmcw.cn -->
+
+</body>
+</html>
